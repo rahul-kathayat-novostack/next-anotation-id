@@ -4,3 +4,4 @@ module.exports = {
         "./babel-plugins/add-debug-attributes.js"
     ]
 };
+// Trigger reload
