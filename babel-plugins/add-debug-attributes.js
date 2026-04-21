@@ -8,7 +8,6 @@ module.exports = function ({ types: t }) {
                 let hasChanges = false;
                 const newChildren = children.map(child => {
                     if (t.isJSXText(child) && child.value.trim().length > 0) {
-                        // Wrap text in span if it's part of a mixed/multiple content
                         const span = t.jsxElement(
                             t.jsxOpeningElement(t.jsxIdentifier('span'), []),
                             t.jsxClosingElement(t.jsxIdentifier('span')),
@@ -16,7 +15,6 @@ module.exports = function ({ types: t }) {
                             false
                         );
 
-                        // Transfer location
                         if (child.loc) {
                             span.openingElement.loc = child.loc;
                         }
@@ -34,67 +32,51 @@ module.exports = function ({ types: t }) {
             JSXOpeningElement(path, state) {
                 const node = path.node;
 
-                // component name
+                // 1. Get source filename
+                const filePath = state.file.opts.filename || "";
+                const relativePath = filePath.replace(process.cwd() + "/", "");
+
+                // IGNORE UI LIBRARY COMPONENTS
+                if (relativePath.includes('components/ui/')) {
+                    return;
+                }
+
+                // 3. Get component name
                 const componentName =
                     path.findParent((p) => p.isFunctionDeclaration() || p.isVariableDeclarator())
                         ?.node?.id?.name || "Anonymous";
 
-                // source filename
-                const filePath = state.file.opts.filename || "";
-                const relativePath = filePath.replace(process.cwd() + "/", "");
-
-                // line number (JSX element start)
-                const line = node.loc?.start?.line || null;
-                // add data-editable if not present
+                // 4. Add data attributes if not already present
                 const hasEditable = node.attributes.some(
                     (attr) => t.isJSXAttribute(attr) && attr.name.name === "data-editable"
                 );
 
                 if (!hasEditable) {
-                    // add data-component
+                    // data-editable="true"
                     node.attributes.push(
-                        t.jsxAttribute(
-                            t.jsxIdentifier("data-editable"),
-                            t.stringLiteral("true")
-                        )
-                    );
-                    node.attributes.push(
-                        t.jsxAttribute(
-                            t.jsxIdentifier("data-component"),
-                            t.stringLiteral(componentName)
-                        )
+                        t.jsxAttribute(t.jsxIdentifier("data-editable"), t.stringLiteral("true"))
                     );
 
-                    // add data-source-file
+                    // data-component="..."
                     node.attributes.push(
-                        t.jsxAttribute(
-                            t.jsxIdentifier("data-source-file"),
-                            t.stringLiteral(relativePath)
-                        )
+                        t.jsxAttribute(t.jsxIdentifier("data-component"), t.stringLiteral(componentName))
                     );
 
-                    // add data-line
-                    if (line) {
+                    // data-source-file="..."
+                    node.attributes.push(
+                        t.jsxAttribute(t.jsxIdentifier("data-source-file"), t.stringLiteral(relativePath))
+                    );
+
+                    // data-line / data-col
+                    if (node.loc) {
                         node.attributes.push(
-                            t.jsxAttribute(
-                                t.jsxIdentifier("data-line"),
-                                t.stringLiteral(String(line))
-                            )
+                            t.jsxAttribute(t.jsxIdentifier("data-line"), t.stringLiteral(String(node.loc.start.line)))
                         );
-                    }
-
-                    // add data-col
-                    const column = node.loc?.start?.column;
-                    if (column !== undefined && column !== null) {
                         node.attributes.push(
-                            t.jsxAttribute(
-                                t.jsxIdentifier("data-col"),
-                                t.stringLiteral(String(column))
-                            )
+                            t.jsxAttribute(t.jsxIdentifier("data-col"), t.stringLiteral(String(node.loc.start.column)))
                         );
                     }
                 }
-
             },
         },
     };
