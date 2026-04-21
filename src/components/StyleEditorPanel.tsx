@@ -287,15 +287,15 @@ export default React.forwardRef<StyleEditorPanelHandle, StyleEditorPanelProps>(f
             // Initialize text content for the content editor - ONLY for leaf nodes or text tags
             const hasElementChildren = selectedElement.children.length > 0;
             const isTextTag = ['P', 'SPAN', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'A', 'BUTTON', 'LI', 'LABEL'].includes(selectedElement.tagName);
-            
+
             if (selectedElement.tagName !== 'IMG' && selectedElement.tagName !== 'HTML' && selectedElement.tagName !== 'BODY' && (!hasElementChildren || isTextTag)) {
                 setTextContent(selectedElement.innerText || '');
-                
+
                 // Enable direct on-page editing only if it won't destroy child elements
                 if (!hasElementChildren) {
                     selectedElement.contentEditable = 'true';
                 }
-                
+
                 // Prevent empty elements from collapsing to zero size
                 const originalMinHeight = selectedElement.style.minHeight;
                 const originalMinWidth = selectedElement.style.minWidth;
@@ -767,14 +767,14 @@ export default React.forwardRef<StyleEditorPanelHandle, StyleEditorPanelProps>(f
                 </div>
 
                 {/* Text Content Editor - for elements that support text */}
-                {(['P', 'SPAN', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'A', 'BUTTON', 'LI', 'LABEL'].includes(selectedElement.tagName) || 
-                  (selectedElement.childNodes.length > 0 && selectedElement.children.length === 0)) &&
-                 selectedElement.tagName !== 'HTML' &&
-                 selectedElement.tagName !== 'BODY' && (
-                    <div className="space-y-1">
-                        <Label className="text-[10px] text-muted-foreground">Content</Label>
-                        <textarea
-                            rows={1}
+                {(['P', 'SPAN', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'A', 'BUTTON', 'LI', 'LABEL'].includes(selectedElement.tagName) ||
+                    (selectedElement.childNodes.length > 0 && selectedElement.children.length === 0)) &&
+                    selectedElement.tagName !== 'HTML' &&
+                    selectedElement.tagName !== 'BODY' && (
+                        <div className="space-y-1">
+                            <Label className="text-[10px] text-muted-foreground">Content</Label>
+                            <textarea
+                                rows={1}
                                 value={textContent}
                                 onChange={(e) => {
                                     setTextContent(e.target.value);
