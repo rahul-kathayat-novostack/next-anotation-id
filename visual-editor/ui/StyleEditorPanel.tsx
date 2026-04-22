@@ -1377,11 +1377,10 @@ export default React.forwardRef<StyleEditorPanelHandle, StyleEditorPanelProps>(f
                     </ScrollArea>
                 </Tabs>
                 {hasChanges && (
-                    <div className="flex gap-2 p-4 border-t bg-background">
+                    <div className="flex gap-2 p-4 border-t bg-transparent">
                         <Button
-                            variant="outline"
                             onClick={handleCancel}
-                            className="flex-1"
+                            className="flex-1 bg-background text-foreground cursor-pointer"
                             disabled={!hasChanges}
                         >
                             <Undo className="h-4 w-4 mr-2" />
@@ -1389,7 +1388,7 @@ export default React.forwardRef<StyleEditorPanelHandle, StyleEditorPanelProps>(f
                         </Button>
                         <Button
                             onClick={handleApply}
-                            className="flex-1"
+                            className="flex-1 cursor-pointer"
                             disabled={!hasChanges}
                         >
                             <Check className="h-4 w-4 mr-2" />
